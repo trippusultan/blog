@@ -3,47 +3,60 @@
 {% block title %}{{ action }} Article{% endblock %}
 
 {% block body %}
-<h2>{{ action }} Article</h2>
+<div class="page-header">
+  <div class="page-title">{{ action }} Article</div>
+  <div class="page-sub"><a href="{{ url_for('dashboard') }}">← Dashboard</a></div>
+</div>
+
 <form method="POST">
   <label>
     <span>Title</span>
-    <input type="text" name="title" required autofocus
-           value="{{ article.title if article else '' }}">
+    <input type="text" name="title"
+           value="{{ article.title if article else '' }}"
+           placeholder="Give it a title…"
+           required autofocus>
   </label>
 
-  <label>
-    <span>Category</span>
-    <select name="category">
-      {% for cat in categories %}
-      <option value="{{ cat }}" {{ 'selected' if (article and article.get('category') == cat) else '' }}>
-        {{ cat }}
-      </option>
-      {% endfor %}
-      <option value="" {{ 'selected' if (not article or not article.get('category')) else '' }}>— uncategorised —</option>
-    </select>
-  </label>
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap: var(--g);">
+    <label>
+      <span>Category</span>
+      <select name="category">
+        {% for cat in categories %}
+        <option value="{{ cat }}"
+          {{ 'selected' if (article and article.get('category') == cat) else '' }}>
+          {{ cat }}
+        </option>
+        {% endfor %}
+        <option value=""
+          {{ 'selected' if (not article or not article.get('category')) else '' }}>
+          — uncategorised —
+        </option>
+      </select>
+    </label>
+    <label>
+      <span>Date</span>
+      <input type="date" name="date" value="{{ article.date if article else '' }}">
+    </label>
+  </div>
 
   <label>
     <span>Tags (comma-separated)</span>
     <input type="text" name="tags"
-           value="{{ article.tags | join(', ') if article and article.get('tags') else '' }}"
-           placeholder="e.g. flask, python, tutorial">
+           value="{{ article.tags | join(', ') if article and article.tags else '' }}"
+           placeholder="flask, python, tutorial" />
+    <span class="hint">Tags appear as clickable filters on the home page.</span>
   </label>
 
   <label>
-    <span>Date</span>
-    <input type="date" name="date"
-           value="{{ article.date if article else '' }}">
+    <span>Content</span>
+    <textarea name="content" rows="16"
+              placeholder="Write your article — HTML formatting is rendered as-is…"
+              required>{{ article.content if article else '' }}</textarea>
   </label>
 
-  <label>
-    <span>Content (HTML allowed)</span>
-    <textarea name="content" rows="14" required>{{ article.content if article else '' }}</textarea>
-  </label>
-
-  <div class="form-actions">
+  <div class="page-section" style="display:flex; gap:8px; align-items:center;">
     <button type="submit" class="btn btn-primary">{{ action }}</button>
-    <a href="{{ url_for('dashboard') }}" class="btn">Cancel</a>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-primary outline">Cancel</a>
   </div>
 </form>
 {% endblock %}

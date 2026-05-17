@@ -1,62 +1,68 @@
 {% extends "base.html" %}
 
-{% block title %}{{ article.title }} – Blog{% endblock %}
+{% block title %}{{ article.title }}{% endblock %}
 
 {% block body %}
-<article>
-  <a href="{{ url_for('index') }}" class="back-link">← All articles</a>
+<div class="page-sub" style="margin-bottom:var(--g)">
+  <a href="{{ url_for('index') }}">← All articles</a>
+</div>
 
-  <h1>{{ article.title }}</h1>
-  <div class="article-meta">
-    <time datetime="{{ article.date }}">{{ article.date }}</time>
-    {% if article.get('category') %}
-      <a href="{{ url_for('index') }}?cat={{ article.category }}"
-         class="cat-badge">{{ article.category }}</a>
-    {% endif %}
-  </div>
+<h1>{{ article.title }}</h1>
 
-  {% if article.get('tags') %}
-  <div class="tags-row tags-top">
-    {% for t in article.tags %}
-      <a href="{{ url_for('index') }}?tag={{ t }}" class="tag-chip">#{{ t }}</a>
-    {% endfor %}
-  </div>
+<div class="meta" style="margin:6px 0 20px">
+  <time datetime="{{ article.date }}">{{ article.date }}</time>
+  <span class="sep">·</span>
+  {% if article.get('category') %}
+  <a href="{{ url_for('index') }}?cat={{ article.category }}" class="cat">{{ article.category }}</a>
   {% endif %}
+</div>
 
-  <div class="content">
-    {{ article.content | safe }}
-  </div>
+{% if article.get('tags') %}
+<div class="tag-chips" style="margin-bottom:24px">
+  {% for t in article.tags %}
+  <a href="{{ url_for('index') }}?tag={{ t }}" class="tag-chip">#{{ t }}</a>
+  {% endfor %}
+</div>
+{% endif %}
 
-  <hr class="sep">
+<hr style="border:none;border-top:1px solid var(--border);margin:0 0 1.5rem">
 
-  {# ── comments ────────────────────────────────────────────────────── #}
-  <section id="comments" class="comments-section">
-    <h2>Comments ({{ comments | length }})</h2>
+<div class="article-body">
+  {{ article.content | safe }}
+</div>
 
-    {# comment form #}
-    <form method="POST" action="{{ url_for('post_comment', art_id=article.id) }}"
-          class="comment-form">
-      <input type="text" name="author" placeholder="Your name (optional)"
-             maxlength="60">
-      <textarea name="body" placeholder="Write a comment…" rows="3" required></textarea>
-      <button type="submit">Post Comment</button>
-    </form>
+{# ── comments ────────────────────────────────────────────────────────── #}
+<section class="comments">
+  <h2 style="font-size:1.2rem;margin-bottom:1rem;">Comments ({{ comments | length }})</h2>
 
-    {% if comments %}
+  <form method="POST" action="{{ url_for('post_comment', art_id=article.id) }}"
+        class="comment-form">
+    <div style="display:grid;grid-template-columns:1fr;gap:9px">
+      <label>
+        <span>Name (optional)</span>
+        <input type="text" name="author" placeholder="Anonymous" maxlength="60">
+      </label>
+      <label>
+        <span>Comment</span>
+        <textarea name="body" placeholder="Share your thoughts…" rows="3" required></textarea>
+      </label>
+    </div>
+    <button type="submit" class="btn btn-primary">Post Comment</button>
+  </form>
+
+  {% if comments %}
     <div class="comment-list">
       {% for c in comments %}
       <div class="comment" id="c-{{ c.id }}">
-        <div class="comment-header">
-          <strong>{{ c.author | e or 'Anonymous' }}</strong>
+        <div class="comment-head">
+          <strong>{{ c.author | e }}</strong>
           <time datetime="{{ c.date }}">
             {{ c.date[:10] }}{% if c.date[11:] %} {{ c.date[11:16] }}{% endif %}
           </time>
           {% if session.get('logged_in') %}
-          <form action="{{ url_for('delete_comment_route', cmt_id=c.id) }}"
-                method="POST"
-                class="inline-delete"
+          <form method="POST" action="{{ url_for('delete_comment_route', cmt_id=c.id) }}"
                 onsubmit="return confirm('Delete this comment?')">
-            <button type="submit" class="btn-delete">✕</button>
+            <button type="submit" class="cmt-del">✕</button>
           </form>
           {% endif %}
         </div>
@@ -64,9 +70,8 @@
       </div>
       {% endfor %}
     </div>
-    {% else %}
-    <p class="muted">No comments yet — be the first.</p>
-    {% endif %}
-  </section>
-</article>
+  {% else %}
+  <p class="tbody-s">No comments yet.</p>
+  {% endif %}
+</section>
 {% endblock %}

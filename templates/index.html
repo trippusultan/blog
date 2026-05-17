@@ -1,73 +1,67 @@
 {% extends "base.html" %}
 
 {% block title %}
-  {% if query %}Search: {{ query }} — {% endif %}
+  {% if query %}Search: "{{ query }}" — {% endif %}
   {% if active_cat %}{{ active_cat }} — {% endif %}
   {% if active_tag %}#{{ active_tag }} — {% endif %}
-  Blog — Home
+  Home
 {% endblock %}
 
 {% block body %}
-{# search bar #}
+{# search bar ────────────────────────────────────────────────── #}
 <form action="{{ url_for('index') }}" method="get" class="search-bar">
-  <input type="text" name="q" placeholder="Search articles…"
-         value="{{ query }}" autofocus>
-  <button type="submit">Search</button>
-  {% if query %}
-    <a href="{{ url_for('index') }}" class="btn-clear">Clear</a>
-  {% endif %}
+  <input type="text" name="q" placeholder="Search articles…" value="{{ query }}">
+  <button type="submit" class="btn btn-primary btn-sm">Search</button>
+  {% if query %}<a href="{{ url_for('index') }}" class="btn btn-xs">Clear</a>{% endif %}
 </form>
 
-{# category pills #}
-<div class="filter-row">
-  <a href="{{ url_for('index') }}"
-     class="pill {{ 'active' if not active_cat and not active_tag else '' }}">All</a>
+<div class="pills">
+  <a href="{{ url_for('index') }}" class="pill {{ 'active' if not active_cat and not active_tag else '' }}">All</a>
   {% for c in categories %}
   <a href="{{ url_for('index') }}?cat={{ c }}" class="pill {{ 'active' if active_cat == c else '' }}">{{ c }}</a>
   {% endfor %}
 </div>
 
 {% if active_tag %}
-<div class="filter-row">
-  <span class="tag-filter-label">Tagged
-    <a href="{{ url_for('index') }}">#{{ active_tag }}</a>
-  </span>
+<div class="pills" style="margin-bottom:8px">
+  <span class="cat" style="align-self:center">Tagged<br>
+    <a href="{{ url_for('index') }}?tag={{ active_tag }}">#{{ active_tag }}</a></span>
 </div>
 {% endif %}
 
-<h2 class="section-title">
-  {% if query %}Results for "{{ query }}"{% endif %}
-  {% if active_cat %}{{ active_cat }} articles{% endif %}
-  {% if active_tag %}#{{ active_tag }} articles{% endif %}
+<h2 class="page-title" style="margin-bottom:var(--g)">
+  {% if query %}Search results for "{{ query }}"{% endif %}
+  {% if active_cat %}{{ active_cat }}{% endif %}
+  {% if active_tag %}#{{ active_tag }}{% endif %}
   {% if not query and not active_cat and not active_tag %}Latest Articles{% endif %}
 </h2>
 
-{% if articles %}
-  {% for art in articles %}
-  <article class="card">
-    <h3>
-      <a href="{{ url_for('article', art_id=art.id) }}">{{ art.title }}</a>
-    </h3>
-    <div class="meta">
-      <time datetime="{{ art.date }}">{{ art.date }}</time>
-      {% if art.get('category') %}
-        <a href="{{ url_for('index') }}?cat={{ art.category }}"
-           class="cat-badge">{{ art.category }}</a>
-      {% endif %}
-      <span class="sep">·</span>
-      <span>{{ (art.content | striptags | truncate(160)) }}</span>
-    </div>
-    {% if art.get('tags') %}
-    <div class="tags-row">
-      {% for t in art.tags %}
+<div class="articles-list">
+  {% if articles %}
+    {% for art in articles %}
+    <div class="card">
+      <div style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin-bottom:4px">
+        {% if art.get('category') %}
+        <a href="{{ url_for('index') }}?cat={{ art.category }}" class="cat">{{ art.category }}</a>
+        {% endif %}
+        <time datetime="{{ art.date }}" class="tbody-s">{{ art.date }}</time>
+      </div>
+      <a href="{{ url_for('article', art_id=art.id) }}" class="art-title">{{ art.title }}</a>
+      <p class="meta">
+        {{ art.content | striptags | truncate(180) }}
+      </p>
+      {% if art.get('tags') %}
+      <div class="tag-chips" style="margin-bottom:8px">
+        {% for t in art.tags %}
         <a href="{{ url_for('index') }}?tag={{ t }}" class="tag-chip">#{{ t }}</a>
-      {% endfor %}
+        {% endfor %}
+      </div>
+      {% endif %}
+      <a href="{{ url_for('article', art_id=art.id) }}" class="btn btn-xs" style="font-weight:600">Read more →</a>
     </div>
-    {% endif %}
-    <a href="{{ url_for('article', art_id=art.id) }}" class="read-more">Read more →</a>
-  </article>
-  {% endfor %}
-{% else %}
-  <p class="empty">No articles found.</p>
-{% endif %}
+    {% endfor %}
+  {% else %}
+  <p class="empty">Nothing found. Try a different search or <a href="{{ url_for('index') }}">browse all articles</a>.</p>
+  {% endif %}
+</div>
 {% endblock %}

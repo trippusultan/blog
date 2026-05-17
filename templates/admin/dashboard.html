@@ -1,62 +1,90 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Dashboard{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
 {% block body %}
-<h2>Dashboard</h2>
-<p class="page-meta">
-  {{ articles|length }} article{{ 's' if articles|length != 1 else '' }} published &nbsp;·&nbsp;
-  <a href="{{ url_for('index') }}">← View site</a>
-</p>
+<div class="page-header">
+  <div class="page-title">Dashboard</div>
+  <div class="page-sub">
+    <a href="{{ url_for('index') }}">← Back to site</a>
+  </div>
+</div>
 
-<a href="{{ url_for('add_article') }}" class="btn btn-primary">+ New Article</a>
+{# ── stats ──────────────────────────────────────────────────────── #}
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-num">{{ articles|length }}</div>
+    <div class="stat-label">Published</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num">{{ categories|length }}</div>
+    <div class="stat-label">Categories</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num">{% set tags = [] %}{% for a in articles %}{% for t in a.tags %}{% if t not in tags %}{% do tags.append(t) %}{% endif %}{% endfor %}{% endfor %}{{ tags|length }}</div>
+    <div class="stat-label">Tags</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num">
+      {% set newest = articles[0].date if articles %}{{ newest[5:7] }}/{{ newest[:4] if newest else '—' }}</div>
+    <div class="stat-label">Last Post</div>
+  </div>
+</div>
 
-{% if articles %}
-<table>
-  <thead>
-    <tr>
-      <th>Title</th>
-      <th>Category</th>
-      <th>Tags</th>
-      <th>Date</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
+<div class="page-section">
+  <div class="page-section-heading">Posts</div>
+  <a href="{{ url_for('add_article') }}" class="btn btn-primary" style="margin-bottom:16px">+ New Article</a>
+
+  {% if articles %}
+  <table>
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Category</th>
+        <th style="width:26%">Tags</th>
+        <th>Date</th>
+        <th style="text-align:right">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
     {% for art in articles %}
-    <tr>
-      <td><a href="{{ url_for('article', art_id=art.id) }}">{{ art.title }}</a></td>
-      <td>
-        {% if art.get('category') %}
-        <a href="{{ url_for('index') }}?cat={{ art.category }}" class="cat-badge">{{ art.category }}</a>
-        {% else %}
-        <span class="muted">—</span>
-        {% endif %}
-      </td>
-      <td>
-        {% if art.get('tags') %}
-        <div class="tags-row">
+      <tr>
+        <td>
+          <a href="{{ url_for('article', art_id=art.id) }}" class="art-title">{{ art.title }}</a>
+          <div class="meta tbody-s"><span>{{ art.id }}</span></div>
+        </td>
+        <td>
+          {% if art.get('category') %}
+          <a href="{{ url_for('index') }}?cat={{ art.category }}" class="cat">{{ art.category }}</a>
+          {% else %}
+          <span class="tbody-s">—</span>
+          {% endif %}
+        </td>
+        <td>
+          <div class="tag-chips">
           {% for t in art.tags %}
-          <a href="{{ url_for('index') }}?tag={{ t }}" class="tag-chip">#{{ t }}</a>
+            <a href="{{ url_for('index') }}?tag={{ t }}" class="tag-chip">#{{ t }}</a>
           {% endfor %}
-        </div>
-        {% else %}
-        <span class="muted">—</span>
-        {% endif %}
-      </td>
-      <td><time datetime="{{ art.date }}">{{ art.date }}</time></td>
-      <td class="actions">
-        <a href="{{ url_for('edit_article', art_id=art.id) }}" class="btn btn-small">Edit</a>
-        <form action="{{ url_for('delete_article_route', art_id=art.id) }}" method="POST"
-              onsubmit="return confirm('Delete “{{ art.title }}” permanently?')">
-          <button type="submit" class="btn btn-danger btn-small">Delete</button>
-        </form>
-      </td>
-    </tr>
+          </div>
+        </td>
+        <td class="tbody-s">
+          <time datetime="{{ art.date }}">{{ art.date }}</time>
+        </td>
+        <td>
+          <div class="actions" style="justify-content:flex-end">
+            <a href="{{ url_for('edit_article', art_id=art.id) }}" class="btn btn-xs btn-primary">Edit</a>
+            <form action="{{ url_for('delete_article_route', art_id=art.id) }}" method="POST"
+                  onsubmit="return confirm('Delete “{{ art.title }}”?')">
+              <button type="submit" class="btn btn-xs btn-danger">Delete</button>
+            </form>
+          </div>
+        </td>
+      </tr>
     {% endfor %}
-  </tbody>
-</table>
-{% else %}
-  <p class="empty">No articles. <a href="{{ url_for('add_article') }}">Create your first one →</a></p>
-{% endif %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty">No articles yet. <a href="{{ url_for('add_article') }}">Write the first one →</a></p>
+  {% endif %}
+</div>
 {% endblock %}

@@ -1,35 +1,46 @@
-{# templates/base.html ─────────────────────────────────────────────── #}
+{# templates/base.html ─────────────────────────────────────────────── #
+   Nav bar + flash — children blocks: title, body ────────────────────── #}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}Blog{% endblock %}</title>
+  <title>{% block title %}Blog{% if title and title != 'Blog' %} · {{ title }}{% endif %}{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <header>
-    <a href="{{ url_for('index') }}" class="logo">Blog</a>
-    <nav>
-      <a href="{{ url_for('index') }}">Home</a>
-      {% if session.get('logged_in') %}
-        <a href="{{ url_for('dashboard') }}">Dashboard</a>
-        <a href="{{ url_for('logout') }}" class="logout">Logout</a>
-      {% endif %}
-    </nav>
-  </header>
-  <main>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for cat, msg in messages %}
-          <div class="flash {{ cat }}">{{ msg }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-    {% block body %}{% endblock %}
-  </main>
-  <footer>
-    <p>Personal Blog — built with Flask</p>
-  </footer>
+
+{# ── NAV BAR ─────────────────────────────────────────────────────── #}
+<nav class="navbar">
+  <a href="{{ url_for('index') }}" class="nav-brand">Blog</a>
+
+  <div class="nav-space"></div>
+
+  <div class="nav-links">
+    <a href="{{ url_for('index') }}" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">Home</a>
+
+    {% if session.get('logged_in') %}
+      <a href="{{ url_for('dashboard') }}" class="nav-link {% if 'dashboard' in request.endpoint %}active{% endif %}">Dashboard</a>
+      <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
+    {% else %}
+      <a href="{{ url_for('login') }}" class="btn-login">Admin Login</a>
+    {% endif %}
+  </div>
+</nav>
+
+{# ── MAIN PAGE ───────────────────────────────────────────────────── #}
+<div class="page{% if wide %} wide{% endif %}">
+  {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}
+    {% for cat, msg in messages %}
+    <div class="flash {{ cat }}">{{ msg }}</div>
+    {% endfor %}{% endif %}{% endwith %}
+
+  {% block body %}{% endblock %}
+</div>
+
+<footer>
+  <p>Personal Blog · Flask · Verified · Private · Own the content</p>
+</footer>
+
 </body>
 </html>
