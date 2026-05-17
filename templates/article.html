@@ -4,11 +4,69 @@
 
 {% block body %}
 <article>
-  <a href="{{ url_for('index') }}" class="back-link">← Back to articles</a>
+  <a href="{{ url_for('index') }}" class="back-link">← All articles</a>
+
   <h1>{{ article.title }}</h1>
-  <time datetime="{{ article.date }}">{{ article.date }}</time>
+  <div class="article-meta">
+    <time datetime="{{ article.date }}">{{ article.date }}</time>
+    {% if article.get('category') %}
+      <a href="{{ url_for('index') }}?cat={{ article.category }}"
+         class="cat-badge">{{ article.category }}</a>
+    {% endif %}
+  </div>
+
+  {% if article.get('tags') %}
+  <div class="tags-row tags-top">
+    {% for t in article.tags %}
+      <a href="{{ url_for('index') }}?tag={{ t }}" class="tag-chip">#{{ t }}</a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
   <div class="content">
     {{ article.content | safe }}
   </div>
+
+  <hr class="sep">
+
+  {# ── comments ────────────────────────────────────────────────────── #}
+  <section id="comments" class="comments-section">
+    <h2>Comments ({{ comments | length }})</h2>
+
+    {# comment form #}
+    <form method="POST" action="{{ url_for('post_comment', art_id=article.id) }}"
+          class="comment-form">
+      <input type="text" name="author" placeholder="Your name (optional)"
+             maxlength="60">
+      <textarea name="body" placeholder="Write a comment…" rows="3" required></textarea>
+      <button type="submit">Post Comment</button>
+    </form>
+
+    {% if comments %}
+    <div class="comment-list">
+      {% for c in comments %}
+      <div class="comment" id="c-{{ c.id }}">
+        <div class="comment-header">
+          <strong>{{ c.author | e or 'Anonymous' }}</strong>
+          <time datetime="{{ c.date }}">
+            {{ c.date[:10] }}{% if c.date[11:] %} {{ c.date[11:16] }}{% endif %}
+          </time>
+          {% if session.get('logged_in') %}
+          <form action="{{ url_for('delete_comment_route', cmt_id=c.id) }}"
+                method="POST"
+                class="inline-delete"
+                onsubmit="return confirm('Delete this comment?')">
+            <button type="submit" class="btn-delete">✕</button>
+          </form>
+          {% endif %}
+        </div>
+        <p>{{ c.body | e }}</p>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="muted">No comments yet — be the first.</p>
+    {% endif %}
+  </section>
 </article>
 {% endblock %}

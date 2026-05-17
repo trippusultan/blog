@@ -2,13 +2,25 @@
   {
     "id": "welcome",
     "title": "Welcome to the Blog",
-    "content": "<p>This is your first article. Edit or delete it from the admin dashboard.</p><p>You can write articles in plain HTML — or add Markdown support later.</p>",
-    "date": "2025-05-16"
+    "content": "<p>This is your first article. Edit or delete it from the admin dashboard.</p><p>You can write articles in plain HTML \u2014 or add Markdown support later.</p>",
+    "date": "2025-05-16",
+    "category": "Tutorial",
+    "tags": [
+      "flask",
+      "python",
+      "blog"
+    ]
   },
   {
     "id": "getting-started",
     "title": "Getting Started with Flask",
-    "content": "<p>Flask is a lightweight Python web framework. It's perfect for small projects like this blog.</p><p>Key concepts:</p><ul><li><strong>Routes</strong> — URL patterns mapped to Python functions</li><li><strong>Templates</strong> — HTML files rendered with Jinja2</li><li><strong>Sessions</strong> — server-side state for logged-in users</li></ul>",
-    "date": "2025-05-15"
+    "content": "<p>Flask is a lightweight Python web framework. It's perfect for small projects like this blog.</p><p>Key concepts:</p><ul><li><strong>Routes</strong> \u2014 URL patterns mapped to Python functions</li><li><strong>Templates</strong> \u2014 HTML files rendered with Jinja2</li><li><strong>Sessions</strong> \u2014 server-side state for logged-in users</li></ul>",
+    "date": "2025-05-15",
+    "category": "Tutorial",
+    "tags": [
+      "flask",
+      "python",
+      "blog"
+    ]
   }
 ]

@@ -4,7 +4,10 @@
 
 {% block body %}
 <h2>Dashboard</h2>
-<p class="page-meta">{{ articles|length }} article{{ 's' if articles|length != 1 else '' }} published</p>
+<p class="page-meta">
+  {{ articles|length }} article{{ 's' if articles|length != 1 else '' }} published &nbsp;·&nbsp;
+  <a href="{{ url_for('index') }}">← View site</a>
+</p>
 
 <a href="{{ url_for('add_article') }}" class="btn btn-primary">+ New Article</a>
 
@@ -13,6 +16,8 @@
   <thead>
     <tr>
       <th>Title</th>
+      <th>Category</th>
+      <th>Tags</th>
       <th>Date</th>
       <th>Actions</th>
     </tr>
@@ -21,7 +26,25 @@
     {% for art in articles %}
     <tr>
       <td><a href="{{ url_for('article', art_id=art.id) }}">{{ art.title }}</a></td>
-      <td>{{ art.date }}</td>
+      <td>
+        {% if art.get('category') %}
+        <a href="{{ url_for('index') }}?cat={{ art.category }}" class="cat-badge">{{ art.category }}</a>
+        {% else %}
+        <span class="muted">—</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if art.get('tags') %}
+        <div class="tags-row">
+          {% for t in art.tags %}
+          <a href="{{ url_for('index') }}?tag={{ t }}" class="tag-chip">#{{ t }}</a>
+          {% endfor %}
+        </div>
+        {% else %}
+        <span class="muted">—</span>
+        {% endif %}
+      </td>
+      <td><time datetime="{{ art.date }}">{{ art.date }}</time></td>
       <td class="actions">
         <a href="{{ url_for('edit_article', art_id=art.id) }}" class="btn btn-small">Edit</a>
         <form action="{{ url_for('delete_article_route', art_id=art.id) }}" method="POST"

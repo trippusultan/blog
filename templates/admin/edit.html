@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% from "macros.html" import field %}
 
 {% block title %}{{ action }} Article{% endblock %}
 
@@ -13,13 +12,32 @@
   </label>
 
   <label>
+    <span>Category</span>
+    <select name="category">
+      {% for cat in categories %}
+      <option value="{{ cat }}" {{ 'selected' if (article and article.get('category') == cat) else '' }}>
+        {{ cat }}
+      </option>
+      {% endfor %}
+      <option value="" {{ 'selected' if (not article or not article.get('category')) else '' }}>— uncategorised —</option>
+    </select>
+  </label>
+
+  <label>
+    <span>Tags (comma-separated)</span>
+    <input type="text" name="tags"
+           value="{{ article.tags | join(', ') if article and article.get('tags') else '' }}"
+           placeholder="e.g. flask, python, tutorial">
+  </label>
+
+  <label>
     <span>Date</span>
     <input type="date" name="date"
            value="{{ article.date if article else '' }}">
   </label>
 
   <label>
-    <span>Content (HTML)</span>
+    <span>Content (HTML allowed)</span>
     <textarea name="content" rows="14" required>{{ article.content if article else '' }}</textarea>
   </label>
 
