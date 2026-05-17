@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }} – Blog{% endblock %}
+
+{% block body %}
+<article>
+  <a href="{{ url_for('index') }}" class="back-link">← Back to articles</a>
+  <h1>{{ article.title }}</h1>
+  <time datetime="{{ article.date }}">{{ article.date }}</time>
+  <div class="content">
+    {{ article.content | safe }}
+  </div>
+</article>
+{% endblock %}

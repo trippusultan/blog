@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% from "macros.html" import field %}
+
+{% block title %}{{ action }} Article{% endblock %}
+
+{% block body %}
+<h2>{{ action }} Article</h2>
+<form method="POST">
+  <label>
+    <span>Title</span>
+    <input type="text" name="title" required autofocus
+           value="{{ article.title if article else '' }}">
+  </label>
+
+  <label>
+    <span>Date</span>
+    <input type="date" name="date"
+           value="{{ article.date if article else '' }}">
+  </label>
+
+  <label>
+    <span>Content (HTML)</span>
+    <textarea name="content" rows="14" required>{{ article.content if article else '' }}</textarea>
+  </label>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">{{ action }}</button>
+    <a href="{{ url_for('dashboard') }}" class="btn">Cancel</a>
+  </div>
+</form>
+{% endblock %}

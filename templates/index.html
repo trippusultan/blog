@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Blog — Home{% endblock %}
+
+{% block body %}
+<h2>Latest Articles</h2>
+{% if articles %}
+  {% for art in articles %}
+  <article class="card">
+    <h3><a href="{{ url_for('article', art_id=art.id) }}">{{ art.title }}</a></h3>
+    <time datetime="{{ art.date }}">{{ art.date }}</time>
+    <p class="excerpt">
+      {{ art.content | striptags | truncate(180) }}
+    </p>
+    <a href="{{ url_for('article', art_id=art.id) }}" class="read-more">Read more →</a>
+  </article>
+  {% endfor %}
+{% else %}
+  <p class="empty">No articles yet. <a href="{{ url_for('add_article') }}">Write one →</a></p>
+{% endif %}
+{% endblock %}
